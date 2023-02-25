@@ -3,7 +3,11 @@ const router = require("express").Router();
 const User = require("./../models/User.model");
 const bcrypt = require("bcryptjs");
 
+
 // const wowowowow = require("wowowowow");
+
+const isLoggedIn = require("./../middleware/isLoggedIn");
+
 
 
 const saltRounds = 10;
@@ -55,7 +59,87 @@ router.post("/signup", (req, res) => {
         });
       });
   });
-  
 
+
+// The GET / login
+
+router.get("/login", (req, res) => {
+  res.render("auth/login-form");
+});
+
+// The POST / login
+
+// POST /login
+router.post("/login", (req, res) => {
+    // Get the username and password from the req.body
+    const { username, password } = req.body;
+  
+    // Check if the username and the password are provided
+    const usernameNotProvided = !username || username === "";
+    const passwordNotProvided = !password || password === "";
+  
+    if (usernameNotProvided || passwordNotProvided) {
+        const errorMessage = usernameNotProvided
+        ? "Please, provide username."
+        : "Please, provide password.";
+      
+        res.render("auth/login-form", {
+        errorMessage: "Provide username and password.",
+      });
+  
+      return;
+    }
+  
+    let user;
+    // Check if the user exists
+    User.findOne({ username: username })
+      .then((foundUser) => {
+        user = foundUser;
+  
+        if (!foundUser) {
+          throw new Error("Wrong credentials");
+        }
+  
+        // Compare the passwords
+        return bcrypt.compare(password, foundUser.password);
+      })
+      .then((isCorrectPassword) => {
+        if (!isCorrectPassword) {
+          throw new Error("Wrong credentials");
+        } else if (isCorrectPassword) {
+          
+          req.session.user = user;
+          res.redirect("/");
+        }
+      })
+      .catch((err) => {
+        res.render("auth/login-form", {
+          errorMessage: err.message || "Provide username and password.",
+        });
+      });
+  });
+
+  // The GET / logout
+
+ 
+  router.get("/logout", isLoggedIn, (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.render("error");
+        }
+        res.redirect("/");
+  });
+});
+
+// The GET / main (protected route)
+
+router.get("/main", isLoggedIn, (req, res) => {
+    res.render("main", { user: req.session.user });
+  });
+  
+  // The GET / private (protected route)
+  router.get("/private", isLoggedIn, (req, res) => {
+    res.render("private", { user: req.session.user });
+  });
 
 module.exports = router;

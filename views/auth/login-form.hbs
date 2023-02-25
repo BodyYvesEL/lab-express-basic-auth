@@ -1,15 +1,16 @@
-<form id="form" action="/signup" method="POST">
+<form id="form" action="/login" method="POST">
 
-  <label for="username"><b>Username</b></label>
+   <label for="username"><b>Username</b></label>
   <input type="text" name="username" placeholder="Your username" />
 
   <label for="password"><b>Password</b></label>
   <input type="password" name="password" placeholder="Your password" />
 
-  <button type="submit">Create Account</button>
+  <button type="submit">Login</button>
 </form>
 
 {{! error message display: }}
+
 
 
 {{#if errorMessage}}
