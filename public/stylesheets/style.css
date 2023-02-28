@@ -35,7 +35,7 @@ a {
 }
 
 button:hover {
-  transition: 0.4s ease background;
+  transition: 0.4s ease;
   background: #00B7FF;
   color: #fff;
 }
@@ -47,7 +47,7 @@ button:hover {
   color: #fff;
   margin: 20px auto;
   padding: 20px;
-  width: 100%;
+  width: 25%;
   margin-bottom: 10px;
 
 }
